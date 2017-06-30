@@ -26,18 +26,27 @@ namespace XMLToJSON.Models
         //Check file extension
         public bool isXMLFormat()
         {
-            return filePath.Substring(filePath.Length - 4, 4).ToUpper() == ".XML";
+            return (filePath.Length - 4) >= 0 ?
+                filePath.Substring(filePath.Length - 4, 4).ToUpper() == ".XML": false;
         }
 
         //Check file extension
         public bool isJSONFormat()
         {
-            return filePath.Substring(filePath.Length - 5, 5).ToUpper() == ".JSON";
+            return (filePath.Length - 5) >= 0 ? 
+                filePath.Substring(filePath.Length - 5, 5).ToUpper() == ".JSON": false;
         }
 
         public string ReadFile()
         {
-            return File.ReadAllText(filePath);
+            try
+            {
+                return File.ReadAllText(filePath);
+            }
+            catch(Exception ex)
+            {
+                throw ex;
+            }
         }
 
         public bool SaveAs(string content, string extension)

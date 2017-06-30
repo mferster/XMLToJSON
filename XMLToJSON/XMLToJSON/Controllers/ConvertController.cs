@@ -14,24 +14,32 @@ namespace XMLToJSON.Controllers
         public HttpResponseMessage Post(FileModels file)
         {
             var response = new HttpResponseMessage();
-
-            if (file != null && file.Exists)
+            try
             {
-                var conversion = new ConversionModels();
+                if (file != null && file.Exists)
+                {
+                    var conversion = new ConversionModels();
 
-                //Do the conversion
-                conversion.Convert(file as IFileModels);
+                    //Do the conversion
+                    conversion.Convert(file as IFileModels);
 
-                //Prepare the response
-                response.Content = new StringContent(conversion.Result);
-                response.StatusCode = conversion.Status;
+                    //Prepare the response
+                    response.Content = new StringContent(conversion.Result);
+                    response.StatusCode = conversion.Status;
 
-                return response;
+                    return response;
+                }
+                else
+                {
+                    response.Content = new StringContent("Error: file does not exist");
+                    response.StatusCode = HttpStatusCode.ExpectationFailed;
+                    return response;
+                }
             }
-            else
+            catch(Exception ex)
             {
-                response.Content = new StringContent("Error: file does not exist");
-                response.StatusCode = HttpStatusCode.ExpectationFailed;
+                response.Content = new StringContent(ex.Message);
+                response.StatusCode = HttpStatusCode.InternalServerError;
                 return response;
             }
         }

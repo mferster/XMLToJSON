@@ -18,53 +18,74 @@ namespace XMLToJSON.Models
         //Convert the file from one format to the other
         public void Convert(IFileModels file)
         {
-            if (file == null)
+            try
             {
-                Result = "Error: Cannot find file";
-                Status = HttpStatusCode.ExpectationFailed;
-                return;
+                if (file == null)
+                {
+                    Result = "Error: Cannot find file";
+                    Status = HttpStatusCode.ExpectationFailed;
+                    return;
+                }
+
+                string newFileContents, extension;
+
+                if (file.isXMLFormat())
+                {
+                    newFileContents = ConvertToJSON(file);
+                    extension = ".json";
+                }
+                else if (file.isJSONFormat())
+                {
+                    newFileContents = ConvertToXML(file);
+                    extension = ".xml";
+                }
+                else
+                {
+                    Result = String.Format(
+                        "Error: {0} is neither a xml nor a json file", file.filePath);
+                    Status = HttpStatusCode.ExpectationFailed;
+                    return;
+                }
+
+                file.SaveAs(newFileContents, extension);
+
+                Result = String.Format("C:\\temp\\file{0} created successfully!", extension);
+                Status = HttpStatusCode.Created;
             }
-
-            string newFileContents, extension;
-
-            if (file.isXMLFormat())
+            catch(Exception ex)
             {
-                newFileContents = ConvertToJSON(file);
-                extension = ".json";
+                throw ex;
             }
-            else if (file.isJSONFormat())
-            {
-                newFileContents = ConvertToXML(file);
-                extension = ".xml";
-            }
-            else
-            {
-                Result = String.Format(
-                    "Error: {0} is neither a xml nor a json file", file.filePath);
-                Status = HttpStatusCode.ExpectationFailed;
-                return;
-            }
-
-            file.SaveAs(newFileContents, extension);
-
-            Result = String.Format("C:\\temp\\file{0} created successfully!", extension);
-            Status = HttpStatusCode.Created;
         }
 
         private string ConvertToJSON(IFileModels file)
         {
-            string xml = file.ReadFile();
-            var xmldoc = new System.Xml.XmlDocument();
-            xmldoc.LoadXml(xml);
-            return JsonConvert.SerializeXmlNode(xmldoc);
+            try
+            {
+                string xml = file.ReadFile();
+                var xmldoc = new System.Xml.XmlDocument();
+                xmldoc.LoadXml(xml);
+                return JsonConvert.SerializeXmlNode(xmldoc);
+            }
+            catch(Exception ex)
+            {
+                throw ex;
+            }
         }
 
         private string ConvertToXML(IFileModels file)
         {
-            string json = file.ReadFile();
+            try
+            {
+                string json = file.ReadFile();
 
-            var xml = JsonConvert.DeserializeXmlNode(json);
-            return xml.OuterXml;
+                var xml = JsonConvert.DeserializeXmlNode(json);
+                return xml.OuterXml;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
     }
 }

@@ -11,27 +11,36 @@ namespace ConsoleXMLToJSON
     {
         static void Main(string[] args)
         {
-            string result;
-            string filePath = PromptUserForFilepath();
-            var file = new FileModels(filePath);
-
-            if (filePath != null && filePath != "" && file.Exists)
+            string result = "Error Occured";
+            try
             {
-                var conversion = new ConversionModels();
-                
-                //Do the Conversion
-                conversion.Convert(file as IFileModels);
+                string filePath = PromptUserForFilepath();
+                var file = new FileModels(filePath);
 
-                //Prepare the results
-                result = conversion.Result;
+                if (filePath != null && filePath != "" && file.Exists)
+                {
+                    var conversion = new ConversionModels();
+
+                    //Do the Conversion
+                    conversion.Convert(file as IFileModels);
+
+                    //Prepare the results
+                    result = conversion.Result;
+                }
+                else
+                {
+                    result = "Error: file does not exist";
+                }
             }
-            else
+            catch (Exception ex)
             {
-                result = "Error: file does not exist";
+                result = ex.Message;
             }
-
-            Console.WriteLine(result);
-            Console.Read();
+            finally
+            {
+                Console.WriteLine(result);
+                Console.Read();
+            }
         }
 
         static string PromptUserForFilepath()
